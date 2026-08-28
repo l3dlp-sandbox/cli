@@ -315,7 +315,7 @@ func (cmd *Command) VisiblePersistentFlags() []Flag {
 			}
 			applies := true
 			for _, name := range fl.Names() {
-				if cmd.lFlag(name) != nil {
+				if cmd.lookupFlag(name) != fl {
 					applies = false
 					break
 				}
