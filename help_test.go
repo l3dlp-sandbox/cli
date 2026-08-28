@@ -904,6 +904,34 @@ GLOBAL OPTIONS:
 	assert.Contains(t, output.String(), expected, "expected output to include global options")
 }
 
+func TestShowSubcommandHelp_InheritedPersistentOptions(t *testing.T) {
+	cmd := &Command{
+		Flags: []Flag{
+			&StringFlag{Name: "root-persistent"},
+		},
+		Commands: []*Command{
+			{
+				Name: "mid",
+				Flags: []Flag{
+					&StringFlag{Name: "mid-persistent"},
+				},
+				Commands: []*Command{
+					{
+						Name: "leaf",
+					},
+				},
+			},
+		},
+	}
+
+	output := &bytes.Buffer{}
+	cmd.Writer = output
+
+	require.NoError(t, cmd.Run(buildTestContext(t), []string{"root", "mid", "leaf", "--help"}))
+	assert.Contains(t, output.String(), "--root-persistent string")
+	assert.Contains(t, output.String(), "--mid-persistent string")
+}
+
 func TestShowSubcommandHelp_SubcommandUsageText(t *testing.T) {
 	cmd := &Command{
 		Commands: []*Command{
